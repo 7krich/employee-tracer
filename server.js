@@ -1,6 +1,17 @@
-const db = require('./db/connection')
+const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+
+// connect to database (mysql)
+const db = mysql.createConnection(
+    {
+        host: 'localhost',
+        user: 'root',
+        password: 'krich',
+        database: 'election'
+    },
+    console.log('Connected to the election database.')
+);
 
 //object to access promp messages
 const promptMsg = {
@@ -10,12 +21,19 @@ const promptMsg = {
     addDepartment: "Add a department",
     addRole: "Add a role",
     addEmployee: "Add a new employee",
-    updateEmployeeRole: "Update an employee role"
+    updateEmployeeRole: "Update an employee role",
+    quit: 'Quit'
 };
 
+db.connect(err => {
+    if (err) throw err;
+    prompt();
+});
+
 // object containing questions for user input
-const promptUser = () => {
-    return inquirer.prompt({
+const prompt = () => {
+    inquirer
+    .prompt({
         name: 'action',
         type: 'list',
         message: 'What would you like to do?',
@@ -26,11 +44,12 @@ const promptUser = () => {
             promptMsg.addDepartment,
             promptMsg.addRole,
             promptMsg.addEmployee,
-            promptMsg.updateEmployeeRole
+            promptMsg.updateEmployeeRole,
+            promptMsg.quit
         ]
     })
     .then(answer => {
-        console.log(`Answer: ${answer}`);
+        console.log('answer', answer);
         // use switch statement to execute function base on answer/'action' aka choice from pomptUser();
         switch(answer.action) {
             case promptMsg.viewAllDepartments: viewAllDepartments();
@@ -53,6 +72,20 @@ const promptUser = () => {
 
             case promptMsg.updateEmployee: updateEmployee();
             break;
+
+            case promptMsg.quit: db.end();
+            break;
         }
     });
 };
+
+function viewAllDepartments() {
+    const query = `SELECT department.id, department.name
+    FROM department
+    ORDER BY department.id`;
+    connection.query(query, (err, res) => {
+        console.log('View all departments');
+        console.table(res);
+        prompt();
+    })
+}
