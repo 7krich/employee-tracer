@@ -24,7 +24,3 @@ VALUES
     ('Malia', 'Brown', 5, 4),
     ('Sarah', 'Lourd', 6, NULL),
     ('Tim', 'Allen', 7, 6);
-
-SELECT * FROM employee;
-SELECT * FROM role;
-SELECT * FROM department;

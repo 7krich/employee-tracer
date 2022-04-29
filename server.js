@@ -15,6 +15,7 @@ const db = mysql.createConnection(
 
 //object to access promp messages
 const promptMsg = {
+    showCompanyTable: "Company Table",
     viewAllDepartments: "View all departments",
     viewAllRoles: "View all roles",
     viewAllEmployees: "View all employees",
@@ -39,6 +40,7 @@ const prompt = () => {
         type: 'list',
         message: 'What would you like to do?',
         choices: [
+            promptMsg.showCompanyTable,
             promptMsg.viewAllDepartments,
             promptMsg.viewAllRoles,
             promptMsg.viewAllEmployees,
@@ -53,7 +55,10 @@ const prompt = () => {
         console.log('answer', answer);
         // use switch statement to execute function base on answer/'action' aka choice from pomptUser();
         switch(answer.action) {
-            case promptMsg.viewAllDepartments: showCompanyTable();
+            case promptMsg.showCompanyTable: showCompanyTable();
+            break;
+
+            case promptMsg.viewAllDepartments: viewAllDepartments();
             break;
 
             case promptMsg.viewAllRoles: viewAllRoles();
@@ -82,12 +87,43 @@ const prompt = () => {
 
 //display company db table
 function showCompanyTable() {
-    const query = `SELECT * FROM employee
+    // pull the employee id, first name, last name, role title, dept name, salary & manager (if appl)
+    // rename dept name as "department"
+    // create a new field that combines the manager ID and first/last
+    const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+    FROM employee
+    LEFT JOIN employee manager ON manager.id = employee.manager_id
+    INNER JOIN role ON (role.id = employee.role_id)
+    INNER JOIN department ON (department.id = role.department_id)
     ORDER BY employee.id;`;
     db.query(query, (err, res) => {
         if (err) throw err;
-        console.log('View all employees:');
+        console.log('Company:');
         console.table(res);
         prompt();
     })
-}
+};
+
+// view all departments
+function viewAllDepartments() {
+    const query = `SELECT * FROM department;`;
+    db.query(query, (err, res) => {
+        if (err) throw err;
+        console.log('Now viewing all departments:');
+        console.table(res);
+        prompt();
+    })
+};
+
+// present the job title, role id, the department that role belongs to, and the salary for that role
+function viewAllRoles() {
+    const query = `SELECT role.id AS role_id, role.title, role.salary, department.name AS department
+    FROM role
+    INNER JOIN department ON (department.id = role.department_id)`;
+    db.query(query, (err, res) => {
+        if (err) throw err;
+        console.log('Now viewing all roles:');
+        console.table(res);
+        prompt();
+    })
+};
