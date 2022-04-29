@@ -8,9 +8,9 @@ const db = mysql.createConnection(
         host: 'localhost',
         user: 'root',
         password: 'krich',
-        database: 'election'
+        database: 'company'
     },
-    console.log('Connected to the election database.')
+    console.log('Connected to the company database.')
 );
 
 //object to access promp messages
@@ -28,6 +28,7 @@ const promptMsg = {
 db.connect(err => {
     if (err) throw err;
     prompt();
+
 });
 
 // object containing questions for user input
@@ -52,7 +53,7 @@ const prompt = () => {
         console.log('answer', answer);
         // use switch statement to execute function base on answer/'action' aka choice from pomptUser();
         switch(answer.action) {
-            case promptMsg.viewAllDepartments: viewAllDepartments();
+            case promptMsg.viewAllDepartments: showCompanyTable();
             break;
 
             case promptMsg.viewAllRoles: viewAllRoles();
@@ -79,12 +80,13 @@ const prompt = () => {
     });
 };
 
-function viewAllDepartments() {
-    const query = `SELECT department.id, department.name
-    FROM department
-    ORDER BY department.id`;
-    connection.query(query, (err, res) => {
-        console.log('View all departments');
+//display company db table
+function showCompanyTable() {
+    const query = `SELECT * FROM employee
+    ORDER BY employee.id;`;
+    db.query(query, (err, res) => {
+        if (err) throw err;
+        console.log('View all employees:');
         console.table(res);
         prompt();
     })
