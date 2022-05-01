@@ -123,6 +123,71 @@ function viewAllEmployees() {
 };
 
 // enter the name of the department and that department is added to the database
+const addRole = async () => {
+    try {
+        console.log("Add a role");
+
+        let department = db.query("SELECT * FROM department");
+
+        let answer = await inquirer.prompt([
+            {
+                name: 'title',
+                type: 'input',
+                message: 'What is the name of the new role you would like to add?',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the name of the role you would like to add!');
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'salary',
+                type: 'input',
+                message: 'What is the salary of this new role?',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the salary of the new role!');
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'departmentId',
+                type: 'choice',
+                choices: `SELECT department.id, ARRAY department.id AS id_array FROM department`,
+                message: 'What department ID needs to be assiciate with this role?',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the department ID of the new role!');
+                        return false;
+                    }
+                }
+            },
+
+        ]);
+        let result = db.query("INSERT INTO role SET ?", {
+            title: answer.title,
+            salary: answer.salary,
+            department_id: answer.departmentId
+        });
+
+        console.log(`${answer.title} successfully added to the database.`);
+        prompt();
+
+    } catch (err) {
+        console.log(err);
+        prompt();
+    };
+};
+
+// add role - enter the name, salary, and department for the role and that role is added to the database
 const addDepartment = async () => {
     try {
         console.log("Add a department");
