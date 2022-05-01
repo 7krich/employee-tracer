@@ -22,7 +22,7 @@ const promptMsg = {
     addDepartment: 'Add a department',
     addRole: 'Add a role',
     addEmployee: 'Add a new employee',
-    updateEmployeeRole: 'Update an employee role',
+    updateEmployee: 'Update an employee role',
     quit: 'Quit'
 };
 
@@ -46,7 +46,7 @@ const prompt = () => {
             promptMsg.addDepartment,
             promptMsg.addRole,
             promptMsg.addEmployee,
-            promptMsg.updateEmployeeRole,
+            promptMsg.updateEmployee,
             promptMsg.quit
         ]
     })
@@ -278,6 +278,7 @@ const addEmployee = async () => {
             },
 
         ]);
+
         let result = db.query("INSERT INTO employee SET ?", {
             first_name: answer.first_name,
             last_name: answer.last_name,
@@ -286,6 +287,62 @@ const addEmployee = async () => {
         });
 
         console.log(`${answer.first_name} ${answer.last_name} successfully added to the database.`);
+        prompt();
+
+    } catch (err) {
+        console.log(err);
+        prompt();
+    };
+};
+
+// update an employee role
+// prompted to select an employee to update and their new role and this information is updated in the database
+const updateEmployee = async () => {
+
+    try {
+        console.log("Update an employee role");
+
+        let answer = await inquirer.prompt([
+            {
+                name: 'employee',
+                type: 'input',
+                choices: `SELECT employee.id ARRAY employee.id AS id_array FROM employee`,
+                message: 'Which employee needs an updated role? Please enter the employee ID',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log("Please enter the employee's ID!");
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'role',
+                type: 'input',
+                choices: `SELECT role.id, ARRAY role.id AS id_array FROM role`,
+                message: "What is the employee's new role ID?",
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log("Please add the new role!");
+                        return false;
+                    }
+                }
+            }
+        ]);
+
+
+        console.log(answer.role)
+        console.log(answer.employee);
+        
+        db.query(`UPDATE employee SET role_id = ${answer.role} WHERE employee.id = ${answer.employee}`, {
+            employee_id: answer.employee,
+            role: answer.role
+        });
+
+        console.log(`Role successfully updated.`);
         prompt();
 
     } catch (err) {
