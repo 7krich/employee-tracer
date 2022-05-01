@@ -2,6 +2,7 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 
+
 // connect to database (mysql)
 const db = mysql.createConnection(
     {
@@ -15,13 +16,13 @@ const db = mysql.createConnection(
 
 //object to access promp messages
 const promptMsg = {
-    viewAllDepartments: "View all departments",
-    viewAllRoles: "View all roles",
-    viewAllEmployees: "View all employees",
-    addDepartment: "Add a department",
-    addRole: "Add a role",
-    addEmployee: "Add a new employee",
-    updateEmployeeRole: "Update an employee role",
+    viewAllDepartments: 'View all departments',
+    viewAllRoles: 'View all roles',
+    viewAllEmployees: 'View all employees',
+    addDepartment: 'Add a department',
+    addRole: 'Add a role',
+    addEmployee: 'Add a new employee',
+    updateEmployeeRole: 'Update an employee role',
     quit: 'Quit'
 };
 
@@ -121,3 +122,28 @@ function viewAllEmployees() {
     })
 };
 
+// enter the name of the department and that department is added to the database
+const addDepartment = async () => {
+    try {
+        console.log("Add a department");
+
+        let answer = await inquirer.prompt([
+            {
+                name: 'departmentName',
+                type: 'input',
+                message: 'What is the name of the department you like to add?'
+            }
+        ]);
+
+        db.query("INSERT INTO department SET ?", {
+            name: answer.departmentName
+        });
+
+        console.log(`${answer.departmentName} successfully added to the database.`);
+        prompt();
+
+    } catch (err) {
+        console.log(err);
+        prompt();
+    };
+};
