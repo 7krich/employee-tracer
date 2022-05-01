@@ -196,7 +196,7 @@ const addDepartment = async () => {
             {
                 name: 'departmentName',
                 type: 'input',
-                message: 'What is the name of the department you like to add?'
+                message: 'What is the name of the department you would like to add?'
             }
         ]);
 
@@ -307,7 +307,7 @@ const updateEmployee = async () => {
                 name: 'employee',
                 type: 'input',
                 choices: `SELECT employee.id ARRAY employee.id AS id_array FROM employee`,
-                message: 'Which employee needs an updated role? Please enter the employee ID',
+                message: "Which employee needs an updated role? Please enter the employee's ID",
                 validate: answer => {
                     if (answer) {
                         return true;
@@ -333,10 +333,6 @@ const updateEmployee = async () => {
             }
         ]);
 
-
-        console.log(answer.role)
-        console.log(answer.employee);
-        
         db.query(`UPDATE employee SET role_id = ${answer.role} WHERE employee.id = ${answer.employee}`, {
             employee_id: answer.employee,
             role: answer.role
