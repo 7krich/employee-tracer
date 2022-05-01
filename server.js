@@ -122,7 +122,7 @@ function viewAllEmployees() {
     })
 };
 
-// enter the name of the department and that department is added to the database
+// add role - enter the name, salary, and department for the role and that role is added to the database
 const addRole = async () => {
     try {
         console.log("Add a role");
@@ -160,7 +160,7 @@ const addRole = async () => {
                 name: 'departmentId',
                 type: 'choice',
                 choices: `SELECT department.id, ARRAY department.id AS id_array FROM department`,
-                message: 'What department ID needs to be assiciate with this role?',
+                message: 'What department ID needs to be associated with this role?',
                 validate: answer => {
                     if (answer) {
                         return true;
@@ -187,7 +187,7 @@ const addRole = async () => {
     };
 };
 
-// add role - enter the name, salary, and department for the role and that role is added to the database
+// enter the name of the department and that department is added to the database
 const addDepartment = async () => {
     try {
         console.log("Add a department");
@@ -205,6 +205,87 @@ const addDepartment = async () => {
         });
 
         console.log(`${answer.departmentName} successfully added to the database.`);
+        prompt();
+
+    } catch (err) {
+        console.log(err);
+        prompt();
+    };
+};
+
+// add employee
+// enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+const addEmployee = async () => {
+    try {
+        console.log("Add an employee");
+
+        let employee = db.query("SELECT * FROM employee");
+
+        let answer = await inquirer.prompt([
+            {
+                name: 'first_name',
+                type: 'input',
+                message: "What is the new employee's first name?",
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the first name of the employee you would like to add!');
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'last_name',
+                type: 'input',
+                message: 'What is the last name of the new employee?',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the last name of the employee you would like to add!');
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'role',
+                type: 'input',
+                choices: `SELECT role.id, ARRAY role.id AS id_array FROM role`,
+                message: 'What role ID needs to be associated with this employee?',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the role ID for the new employee!');
+                        return false;
+                    }
+                }
+            },
+            {
+                name: 'manager',
+                type: 'input',
+                choices: `SELECT manager.id, ARRAY manager.id AS id_array FROM employee`,
+                message: 'What manager ID needs to be associated with this employee?',
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    } else {
+                        console.log('Please enter the manager ID for the new employee!');
+                        return false;
+                    }
+                }
+            },
+
+        ]);
+        let result = db.query("INSERT INTO employee SET ?", {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            role_id: answer.role,
+            manager_id: answer.manager
+        });
+
+        console.log(`${answer.first_name} ${answer.last_name} successfully added to the database.`);
         prompt();
 
     } catch (err) {
